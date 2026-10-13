@@ -1,11 +1,22 @@
 import axios from 'axios';
 
+// Automatic environment detection based on hostname
+const isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
+
+const API_BASE_URL = isProduction 
+    ? 'https://seedmis-server-production.up.railway.app/api'  // Production (Vercel)
+    : 'http://localhost:8000/api';  // Local development
+
+console.log('🚀 Environment:', isProduction ? 'Production' : 'Development');
+console.log('🚀 API Base URL:', API_BASE_URL);
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8000/api',
+  baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
   },
+  timeout: 60000,
 });
 
 // Request interceptor
@@ -31,6 +42,15 @@ api.interceptors.response.use(
       localStorage.removeItem('user');
       window.location.href = '/login';
     }
+    
+    if (error.response) {
+      console.error('API Error:', error.response.data);
+    } else if (error.request) {
+      console.error('Network Error:', error.request);
+    } else {
+      console.error('Error:', error.message);
+    }
+    
     return Promise.reject(error);
   }
 );
