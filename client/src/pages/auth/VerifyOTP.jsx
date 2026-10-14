@@ -11,6 +11,7 @@ import logo from '@/assets/logo.png';
 const VerifyOTP = ({ email, onBack, onBackToLogin }) => {
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isResending, setIsResending] = useState(false);
   const [showResetPassword, setShowResetPassword] = useState(false);
   const [timer, setTimer] = useState(600);
   const inputRefs = useRef([]);
@@ -130,24 +131,33 @@ const VerifyOTP = ({ email, onBack, onBackToLogin }) => {
   };
 
   const handleResend = async () => {
+    if (isResending || timer > 540) return; // Disable if already resending or less than 1 minute passed
+    
+    setIsResending(true);
+    
     try {
       const response = await authService.forgotPassword(email);
       
       if (response.success) {
         setOtp(['', '', '', '', '', '']);
         setTimer(600);
+        inputRefs.current[0]?.focus();
         toast.success('New OTP Sent!', {
           description: 'Check your email for the new verification code'
         });
       }
     } catch (error) {
       toast.error('Failed to resend OTP');
+    } finally {
+      setIsResending(false);
     }
   };
 
   if (showResetPassword) {
     return <ResetPassword email={email} otp={otp.join('')} onBackToLogin={onBackToLogin} />;
   }
+
+  const canResend = timer <= 540 && !isResending;
 
   return (
     <div 
@@ -250,11 +260,15 @@ const VerifyOTP = ({ email, onBack, onBackToLogin }) => {
               <button
                 type="button"
                 onClick={handleResend}
-                className="inline-flex items-center text-green-600 hover:text-green-700 font-semibold transition-colors"
-                disabled={timer > 540}
+                disabled={!canResend}
+                className={`inline-flex items-center font-semibold transition-all ${
+                  canResend 
+                    ? 'text-green-600 hover:text-green-700 cursor-pointer' 
+                    : 'text-gray-400 cursor-not-allowed'
+                }`}
               >
-                <RefreshCw className="w-4 h-4 mr-1" />
-                Resend OTP
+                <RefreshCw className={`w-4 h-4 mr-1 ${isResending ? 'animate-spin' : ''}`} />
+                {isResending ? 'Sending...' : canResend ? 'Resend OTP' : `Resend in ${formatTime(600 - timer)}`}
               </button>
             </div>
           </form>
