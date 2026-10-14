@@ -54,7 +54,17 @@ const authService = {
       const response = await api.post('/client/forgot-password', { email });
       return response.data;
     } catch (error) {
-      throw error.response?.data || { success: false, message: 'Request failed' };
+      throw error;
+    }
+  },
+
+  // Verify OTP
+  verifyOtp: async (email, otp) => {
+    try {
+      const response = await api.post('/client/verify-otp', { email, otp });
+      return response.data;
+    } catch (error) {
+      throw error;
     }
   },
 
@@ -64,7 +74,7 @@ const authService = {
       const response = await api.post('/client/reset-password', data);
       return response.data;
     } catch (error) {
-      throw error.response?.data || { success: false, message: 'Reset failed' };
+      throw error;
     }
   },
 };

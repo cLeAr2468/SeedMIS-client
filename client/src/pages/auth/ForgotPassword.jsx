@@ -4,35 +4,62 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, Loader2, Sprout, Mail } from 'lucide-react';
+import { ArrowLeft, Loader2, Mail, Send } from 'lucide-react';
 import authService from '@/services/authService';
 import { toast } from 'sonner';
+import VerifyOTP from './VerifyOTP';
 import bgLogs from '@/assets/bg-logs.png';
 import logo from '@/assets/logo.png';
 
 const ForgotPassword = () => {
-  const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState('');
-  const [sent, setSent] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showVerifyOTP, setShowVerifyOTP] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
+    
+    if (!email) {
+      toast.error('Please enter your email address');
+      return;
+    }
+
+    setIsSubmitting(true);
 
     try {
       const response = await authService.forgotPassword(email);
+      
       if (response.success) {
-        setSent(true);
-        toast.success('Password reset link sent!', {
-          description: 'Please check your email for instructions.',
+        toast.success('OTP Sent!', {
+          description: 'Check your email for the verification code'
         });
+        setShowVerifyOTP(true);
       }
     } catch (error) {
-      toast.error(error.message || 'Failed to send reset link. Please try again.');
+      console.error('Forgot password error:', error);
+      
+      if (error.response?.status === 404) {
+        toast.error('Email Not Found', {
+          description: 'This email is not registered in the system'
+        });
+      } else if (error.response?.data?.errors) {
+        const firstError = Object.values(error.response.data.errors)[0][0];
+        toast.error('Validation Error', {
+          description: firstError
+        });
+      } else {
+        toast.error('Request Failed', {
+          description: 'Please check your connection and try again'
+        });
+      }
     } finally {
-      setLoading(false);
+      setIsSubmitting(false);
     }
   };
+
+  if (showVerifyOTP) {
+    return <VerifyOTP email={email} onBack={() => setShowVerifyOTP(false)} />;
+  }
 
   return (
     <div 
@@ -46,6 +73,14 @@ const ForgotPassword = () => {
         {/* Forgot Password Card */}
         <Card className="shadow-2xl border-none bg-white/95 backdrop-blur-md">
           <CardHeader className="space-y-4 pb-6">
+            <Link
+              to="/login"
+              className="flex items-center text-green-600 hover:text-green-700 transition-colors group w-fit"
+            >
+              <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
+              <span className="font-medium">Back to Login</span>
+            </Link>
+
             {/* Logo and Branding inside card */}
             <div className="flex flex-col items-center space-y-3">
               <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center shadow-xl p-2 ring-4 ring-green-600/20">
@@ -65,84 +100,58 @@ const ForgotPassword = () => {
             </div>
             <div className="text-center pt-2">
               <CardTitle className="text-2xl font-bold text-gray-800">
-                {sent ? 'Check Your Email' : 'Forgot Password?'}
+                Forgot Password?
               </CardTitle>
               <CardDescription className="mt-2">
-                {sent
-                  ? 'We have sent a password reset link to your email address.'
-                  : 'Enter your email address and we will send you a link to reset your password.'}
+                We'll send you a verification code
               </CardDescription>
             </div>
           </CardHeader>
           <CardContent>
-            {sent ? (
-              <div className="space-y-4">
-                <div className="flex justify-center">
-                  <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center">
-                    <Mail className="w-10 h-10 text-green-600" />
-                  </div>
-                </div>
-                <p className="text-center text-sm text-gray-600">
-                  Didn't receive the email? Check your spam folder or{' '}
-                  <button
-                    onClick={() => setSent(false)}
-                    className="text-green-600 hover:text-green-700 font-medium"
-                  >
-                    try again
-                  </button>
-                </p>
-                <Link to="/login">
-                  <Button className="w-full h-12 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all">
-                    Back to Login
-                  </Button>
-                </Link>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {/* Email */}
+              <div className="space-y-2">
+                <Label htmlFor="email">Email Address</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="Enter your registered email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  disabled={isSubmitting}
+                  className="h-11"
+                />
               </div>
-            ) : (
-              <form onSubmit={handleSubmit} className="space-y-4">
-                {/* Email */}
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email Address</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="your.email@example.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                    disabled={loading}
-                    className="h-11"
-                  />
-                </div>
 
-                {/* Submit Button */}
-                <Button
-                  type="submit"
-                  className="w-full h-12 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all"
-                  disabled={loading}
-                >
-                  {loading ? (
-                    <>
-                      <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                      Sending...
-                    </>
-                  ) : (
-                    'Send Reset Link'
-                  )}
-                </Button>
+              {/* Submit Button */}
+              <Button
+                type="submit"
+                className="w-full h-12 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                    Sending OTP...
+                  </>
+                ) : (
+                  <>
+                    <Send className="w-5 h-5 mr-2" />
+                    Send Verification Code
+                  </>
+                )}
+              </Button>
 
-                {/* Back to Login */}
-                <Link to="/login" className="block text-center">
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    className="w-full text-gray-600 hover:text-gray-900"
-                  >
-                    <ArrowLeft className="w-4 h-4 mr-2" />
-                    Back to Login
-                  </Button>
-                </Link>
-              </form>
-            )}
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-center">
+                <p className="text-sm text-blue-800 font-medium">
+                  OTP will be sent to your registered email
+                </p>
+                <p className="text-xs text-blue-600 mt-1">
+                  {email ? `Email: ${email}` : 'Enter your email address above'}
+                </p>
+              </div>
+            </form>
           </CardContent>
         </Card>
 
