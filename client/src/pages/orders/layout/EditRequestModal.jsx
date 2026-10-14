@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,27 +9,11 @@ import requestService from '@/services/requestService';
 
 const EditRequestModal = ({ request, onClose, onSuccess }) => {
   const [loading, setLoading] = useState(false);
-  const [availableSeedlings, setAvailableSeedlings] = useState([]);
   const [formData, setFormData] = useState({
     seedling_type: request.seedling_type || '',
     quantity: request.quantity || 1,
     requested_date: request.requested_date || new Date().toISOString().split('T')[0],
   });
-
-  useEffect(() => {
-    fetchAvailableSeedlings();
-  }, []);
-
-  const fetchAvailableSeedlings = async () => {
-    try {
-      const response = await requestService.getAvailableSeedlings();
-      if (response.success) {
-        setAvailableSeedlings(response.data);
-      }
-    } catch (error) {
-      console.error('Error fetching seedlings:', error);
-    }
-  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -85,24 +69,25 @@ const EditRequestModal = ({ request, onClose, onSuccess }) => {
           </CardHeader>
           <CardContent className="p-6">
             <form onSubmit={handleSubmit} className="space-y-4">
-              {/* Seedling Type */}
+              {/* Info Message */}
+              <div className="bg-blue-50 border border-blue-200 rounded-md p-3 text-sm text-blue-800">
+                <p className="font-medium mb-1">⚠️ Note:</p>
+                <p>You can only edit quantity and date. To change the seedling type, please cancel this request and create a new one.</p>
+              </div>
+
+              {/* Seedling Type - Disabled */}
               <div className="space-y-2">
                 <Label htmlFor="seedling_type">Seedling Type</Label>
                 <select
                   id="seedling_type"
                   name="seedling_type"
                   value={formData.seedling_type}
-                  onChange={handleChange}
-                  required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent"
+                  disabled
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100 text-gray-600 cursor-not-allowed"
                 >
-                  <option value="">Select seedling type</option>
-                  {availableSeedlings.map((seedling) => (
-                    <option key={seedling.id} value={seedling.seedling_type}>
-                      {seedling.seedling_type} ({seedling.total_available_quantity} available)
-                    </option>
-                  ))}
+                  <option value={formData.seedling_type}>{formData.seedling_type}</option>
                 </select>
+                <p className="text-xs text-gray-500">Seedling type cannot be changed</p>
               </div>
 
               {/* Quantity */}

@@ -1,13 +1,14 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Sprout, Plus } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { useState } from 'react';
 
 const SeedlingCard = ({ seedling, onAddToCart }) => {
   const isLowStock = seedling.total_quantity <= 50;
   const isOutOfStock = seedling.total_quantity === 0;
+  const [imageError, setImageError] = useState(false);
 
-  // Construct the full image URL
+  // Construct the full image URL (same logic as admin side)
   const getImageUrl = () => {
     if (!seedling.image_url) return null;
     
@@ -16,42 +17,40 @@ const SeedlingCard = ({ seedling, onAddToCart }) => {
       return seedling.image_url;
     }
     
-    // Otherwise, construct the URL using the backend base URL
-    const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://seedmis-server-production.up.railway.app';
-    return `${baseUrl}/storage/${seedling.image_url}`;
+    // Otherwise, construct the URL: baseURL + imagePath
+    // Auto-detect environment
+    const isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
+    const baseUrl = isProduction 
+      ? 'https://seedmis-server-production.up.railway.app'
+      : 'http://localhost:8000';
+    
+    return `${baseUrl}/${seedling.image_url}`;
   };
 
   const imageUrl = getImageUrl();
+  const showImage = imageUrl && !imageError;
 
   return (
     <Card className="overflow-hidden hover:shadow-lg transition-shadow h-full flex flex-col">
       {/* Image Section - Fixed aspect ratio */}
       <div className="aspect-square bg-gradient-to-br from-green-100 to-emerald-100 flex items-center justify-center relative overflow-hidden">
-        {imageUrl ? (
+        {showImage ? (
           <img 
             src={imageUrl} 
             alt={seedling.seedling_type}
             className="w-full h-full object-cover"
-            onError={(e) => {
-              // Fallback to icon if image fails to load
-              e.target.style.display = 'none';
-              e.target.nextElementSibling.style.display = 'flex';
-            }}
+            onError={() => setImageError(true)}
           />
-        ) : null}
-        <div className={cn(
-          "absolute inset-0 flex items-center justify-center",
-          imageUrl && "hidden"
-        )}>
+        ) : (
           <Sprout className="w-20 h-20 lg:w-24 lg:h-24 text-green-600" />
-        </div>
+        )}
         {isLowStock && !isOutOfStock && (
-          <span className="absolute top-2 right-2 bg-orange-100 text-orange-700 text-xs px-2 py-1 rounded-full font-medium">
+          <span className="absolute top-2 right-2 bg-orange-100 text-orange-700 text-xs px-2 py-1 rounded-full font-medium z-10">
             Low Stock
           </span>
         )}
         {isOutOfStock && (
-          <span className="absolute top-2 right-2 bg-red-100 text-red-700 text-xs px-2 py-1 rounded-full font-medium">
+          <span className="absolute top-2 right-2 bg-red-100 text-red-700 text-xs px-2 py-1 rounded-full font-medium z-10">
             Out of Stock
           </span>
         )}
@@ -72,10 +71,7 @@ const SeedlingCard = ({ seedling, onAddToCart }) => {
           </div>
           <div className="flex items-center justify-between">
             <span className="text-gray-600 text-sm">Stock:</span>
-            <span className={cn(
-              "font-semibold",
-              isLowStock ? "text-orange-600" : "text-gray-900"
-            )}>
+            <span className={`font-semibold ${isLowStock ? "text-orange-600" : "text-gray-900"}`}>
               {seedling.total_quantity?.toLocaleString()}
             </span>
           </div>
