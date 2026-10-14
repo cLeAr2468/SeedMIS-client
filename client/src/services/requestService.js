@@ -31,13 +31,23 @@ const requestService = {
     }
   },
 
-  // Get request by ID
-  getRequestById: async (id) => {
+  // Update request
+  updateRequest: async (id, requestData) => {
     try {
-      const response = await api.get(`/requests/${id}`);
+      const response = await api.put(`/requests/${id}`, requestData);
       return response.data;
     } catch (error) {
-      throw error.response?.data || { success: false, message: 'Failed to fetch request' };
+      throw error.response?.data || { success: false, message: 'Failed to update request' };
+    }
+  },
+
+  // Cancel/Delete request
+  cancelRequest: async (id) => {
+    try {
+      const response = await api.delete(`/requests/${id}`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { success: false, message: 'Failed to cancel request' };
     }
   },
 };

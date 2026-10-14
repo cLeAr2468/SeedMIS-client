@@ -89,7 +89,11 @@ const Orders = () => {
             ) : (
               <div className="space-y-4">
                 {filteredOrders.map((order) => (
-                  <OrderCard key={order.id} order={order} />
+                  <OrderCard 
+                    key={order.id} 
+                    order={order}
+                    onOrderUpdated={fetchOrders}
+                  />
                 ))}
               </div>
             )}
