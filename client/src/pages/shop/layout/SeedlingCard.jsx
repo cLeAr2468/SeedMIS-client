@@ -7,11 +7,44 @@ const SeedlingCard = ({ seedling, onAddToCart }) => {
   const isLowStock = seedling.total_quantity <= 50;
   const isOutOfStock = seedling.total_quantity === 0;
 
+  // Construct the full image URL
+  const getImageUrl = () => {
+    if (!seedling.image_url) return null;
+    
+    // If image_url is already a full URL (starts with http), use it as is
+    if (seedling.image_url.startsWith('http')) {
+      return seedling.image_url;
+    }
+    
+    // Otherwise, construct the URL using the backend base URL
+    const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://seedmis-server-production.up.railway.app';
+    return `${baseUrl}/storage/${seedling.image_url}`;
+  };
+
+  const imageUrl = getImageUrl();
+
   return (
     <Card className="overflow-hidden hover:shadow-lg transition-shadow h-full flex flex-col">
       {/* Image Section - Fixed aspect ratio */}
-      <div className="aspect-square bg-gradient-to-br from-green-100 to-emerald-100 flex items-center justify-center relative">
-        <Sprout className="w-20 h-20 lg:w-24 lg:h-24 text-green-600" />
+      <div className="aspect-square bg-gradient-to-br from-green-100 to-emerald-100 flex items-center justify-center relative overflow-hidden">
+        {imageUrl ? (
+          <img 
+            src={imageUrl} 
+            alt={seedling.seedling_type}
+            className="w-full h-full object-cover"
+            onError={(e) => {
+              // Fallback to icon if image fails to load
+              e.target.style.display = 'none';
+              e.target.nextElementSibling.style.display = 'flex';
+            }}
+          />
+        ) : null}
+        <div className={cn(
+          "absolute inset-0 flex items-center justify-center",
+          imageUrl && "hidden"
+        )}>
+          <Sprout className="w-20 h-20 lg:w-24 lg:h-24 text-green-600" />
+        </div>
         {isLowStock && !isOutOfStock && (
           <span className="absolute top-2 right-2 bg-orange-100 text-orange-700 text-xs px-2 py-1 rounded-full font-medium">
             Low Stock
