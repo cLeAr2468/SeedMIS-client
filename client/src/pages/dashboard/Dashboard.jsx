@@ -112,7 +112,7 @@ const Dashboard = () => {
           {/* Hero Section */}
           <div className="mb-8 lg:mb-12">
             <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-2">
-              Welcome back, {user?.first_name}! 👋
+              Welcome , {user?.first_name}! 👋
             </h1>
             <p className="text-gray-600 text-lg">
               Discover quality seedlings for your farming needs
