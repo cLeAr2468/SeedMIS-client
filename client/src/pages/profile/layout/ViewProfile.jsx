@@ -10,12 +10,15 @@ const ViewProfile = ({ isOpen, onClose, user }) => {
     { label: 'First Name', value: user?.first_name, icon: User },
     { label: 'Middle Name', value: user?.middle_name, icon: User },
     { label: 'Last Name', value: user?.last_name, icon: User },
+    { label: 'Suffix', value: user?.suffix, icon: User },
     { label: 'Email', value: user?.email, icon: Mail },
     { label: 'Contact Number', value: user?.contact_number, icon: Phone },
     { label: 'Organization', value: user?.organization, icon: Building2 },
+    { label: 'Purok/Street', value: user?.purok, icon: MapPin },
     { label: 'Barangay', value: user?.barangay, icon: MapPin },
     { label: 'Municipality', value: user?.municipality, icon: MapPin },
     { label: 'Province', value: user?.province, icon: MapPin },
+    { label: 'Region', value: user?.region, icon: MapPin },
   ];
 
   return (

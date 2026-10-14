@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Loader2, Package } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { toast } from 'sonner';
-import axios from 'axios';
+import api from '@/services/api';
 import BottomNav from '@/components/layout/BottomNav';
 import MobileHeader from '@/components/layout/MobileHeader';
 import DesktopSidebar from '@/components/layout/DesktopSidebar';
@@ -21,10 +21,7 @@ const Orders = () => {
 
   const fetchOrders = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await axios.get('http://localhost:8000/api/requests', {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await api.get('/requests');
 
       if (response.data.success) {
         // Filter only client orders

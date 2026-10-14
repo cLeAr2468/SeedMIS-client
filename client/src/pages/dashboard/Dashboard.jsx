@@ -13,7 +13,7 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
-import axios from 'axios';
+import api from '@/services/api';
 import { toast } from 'sonner';
 import BottomNav from '@/components/layout/BottomNav';
 import MobileHeader from '@/components/layout/MobileHeader';
@@ -36,10 +36,7 @@ const Dashboard = () => {
 
   const fetchRequests = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await axios.get('http://localhost:8000/api/requests', {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await api.get('/requests');
 
       if (response.data.success) {
         const clientOrders = response.data.data.filter(
