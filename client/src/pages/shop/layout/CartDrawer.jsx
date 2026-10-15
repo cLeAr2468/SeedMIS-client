@@ -38,9 +38,9 @@ const CartDrawer = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50" onClick={onClose}>
+    <div className="fixed inset-0 isolate z-50 bg-black/20 duration-100 supports-backdrop-filter:backdrop-blur-sm" onClick={onClose}>
       <div
-        className="fixed right-0 top-0 bottom-0 w-full lg:w-96 bg-white shadow-xl overflow-y-auto"
+        className="fixed right-0 top-0 bottom-0 w-full sm:w-96 bg-white shadow-2xl overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Cart Header */}
@@ -94,17 +94,51 @@ const CartDrawer = ({
                               variant="outline"
                               className="h-8 w-8"
                               onClick={() => onUpdateQuantity(item.id, -1)}
+                              disabled={item.quantity <= 1}
                             >
                               <Minus className="w-4 h-4" />
                             </Button>
-                            <span className="w-12 text-center font-medium">
-                              {item.quantity}
-                            </span>
+                            <Input
+                              type="number"
+                              min="1"
+                              max={item.total_quantity}
+                              value={item.quantity}
+                              onChange={(e) => {
+                                const value = e.target.value;
+                                // Allow empty input for user to type
+                                if (value === '') {
+                                  onUpdateQuantity(item.id, 0, true); // Set to 0 temporarily
+                                  return;
+                                }
+                                
+                                const numValue = parseInt(value);
+                                
+                                // Prevent negative numbers
+                                if (numValue < 0) return;
+                                
+                                // Prevent exceeding stock
+                                if (numValue > item.total_quantity) {
+                                  onUpdateQuantity(item.id, item.total_quantity - item.quantity);
+                                  return;
+                                }
+                                
+                                // Set the new quantity
+                                onUpdateQuantity(item.id, numValue - item.quantity);
+                              }}
+                              onBlur={(e) => {
+                                // If empty on blur, set to 1
+                                if (e.target.value === '' || parseInt(e.target.value) < 1) {
+                                  onUpdateQuantity(item.id, 1 - item.quantity);
+                                }
+                              }}
+                              className="w-16 text-center font-medium h-8 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                            />
                             <Button
                               size="icon"
                               variant="outline"
                               className="h-8 w-8"
                               onClick={() => onUpdateQuantity(item.id, 1)}
+                              disabled={item.quantity >= item.total_quantity}
                             >
                               <Plus className="w-4 h-4" />
                             </Button>
@@ -117,6 +151,9 @@ const CartDrawer = ({
                               <Trash2 className="w-4 h-4" />
                             </Button>
                           </div>
+                          <p className="text-xs text-gray-500 mt-1">
+                            Max: {item.total_quantity?.toLocaleString()} available
+                          </p>
                         </div>
                       </div>
                     </CardContent>

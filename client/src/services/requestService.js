@@ -41,13 +41,19 @@ const requestService = {
     }
   },
 
-  // Cancel/Delete request
-  cancelRequest: async (id) => {
+  // Cancel request with reason (update status to Cancelled)
+  cancelRequest: async (id, reason) => {
     try {
-      const response = await api.delete(`/requests/${id}`);
-      return response.data;
+      console.log('🔴 Cancelling request:', { id, reason, method: 'PUT', url: `/requests/${id}` });
+      const response = await requestService.updateRequest(id, { 
+        status: 'Cancelled',
+        cancellation_reason: reason 
+      });
+      console.log('✅ Cancel response:', response);
+      return response;
     } catch (error) {
-      throw error.response?.data || { success: false, message: 'Failed to cancel request' };
+      console.error('❌ Cancel error:', error);
+      throw error;
     }
   },
 };

@@ -67,7 +67,7 @@ const EditRequestModal = ({ request, onClose, onSuccess }) => {
               <X className="w-5 h-5" />
             </Button>
           </CardHeader>
-          <CardContent className="p-6">
+          <CardContent className="p-6 pb-24">
             <form onSubmit={handleSubmit} className="space-y-4">
               {/* Info Message */}
               <div className="bg-blue-50 border border-blue-200 rounded-md p-3 text-sm text-blue-800">

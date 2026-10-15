@@ -38,7 +38,7 @@ const Orders = () => {
     }
   };
 
-  const statuses = ['All', 'Pending', 'Approved', 'Released', 'Rejected'];
+  const statuses = ['All', 'Pending', 'Approved', 'Released', 'Rejected', 'Cancelled'];
 
   const filteredOrders = orders.filter((order) => {
     if (selectedStatus === 'All') return true;

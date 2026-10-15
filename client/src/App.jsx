@@ -9,6 +9,7 @@ import ForgotPassword from './pages/auth/ForgotPassword';
 
 // Main Pages
 import Dashboard from './pages/dashboard/Dashboard';
+import Home from './pages/home/Home';
 import Shop from './pages/shop/Shop';
 import Orders from './pages/orders/Orders';
 import Profile from './pages/profile/Profile';
@@ -86,6 +87,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/home"
+            element={
+              <ProtectedRoute>
+                <Home />
               </ProtectedRoute>
             }
           />

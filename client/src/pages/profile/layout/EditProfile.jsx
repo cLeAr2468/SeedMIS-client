@@ -11,7 +11,7 @@ import { Select } from '@/components/ui/select';
 import api from '@/services/api';
 import { useAuth } from '@/context/AuthContext';
 
-const EditProfile = ({ isOpen, onClose, user }) => {
+const EditProfile = ({ isOpen, onClose, user, onProfileUpdated }) => {
   const { updateUser } = useAuth();
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [errors, setErrors] = React.useState({});
@@ -189,6 +189,11 @@ const EditProfile = ({ isOpen, onClose, user }) => {
           updateUser(updatedUser);
         }
         
+        // Call parent callback to refresh
+        if (onProfileUpdated) {
+          onProfileUpdated(updatedUser);
+        }
+        
         onClose();
       }
     } catch (error) {
@@ -222,7 +227,7 @@ const EditProfile = ({ isOpen, onClose, user }) => {
 
   return (
     <div 
-      className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4" 
+      className="fixed inset-0 isolate z-50 bg-black/10 duration-100 supports-backdrop-filter:backdrop-blur-xs flex items-center justify-center p-4" 
       onClick={onClose}
     >
       <div

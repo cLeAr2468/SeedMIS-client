@@ -67,6 +67,11 @@ const Shop = () => {
   const addToCart = (seedling) => {
     const existing = cart.find((item) => item.id === seedling.id);
     if (existing) {
+      // Check if adding one more would exceed stock
+      if (existing.quantity >= seedling.total_quantity) {
+        toast.error(`Cannot add more. Only ${seedling.total_quantity} available in stock.`);
+        return;
+      }
       setCart(
         cart.map((item) =>
           item.id === seedling.id
@@ -80,14 +85,33 @@ const Shop = () => {
     toast.success(`${seedling.seedling_type} added to cart`);
   };
 
-  const updateQuantity = (id, change) => {
+  const updateQuantity = (id, change, isDirectSet = false) => {
     setCart(
       cart
-        .map((item) =>
-          item.id === id
-            ? { ...item, quantity: Math.max(1, item.quantity + change) }
-            : item
-        )
+        .map((item) => {
+          if (item.id === id) {
+            let newQuantity;
+            
+            if (isDirectSet) {
+              // Direct set (from manual input)
+              newQuantity = change;
+            } else {
+              // Increment/decrement
+              newQuantity = item.quantity + change;
+            }
+            
+            // Enforce constraints: min 1, max = total_quantity
+            newQuantity = Math.max(1, Math.min(newQuantity, item.total_quantity));
+            
+            // Show warning if hitting max
+            if (newQuantity >= item.total_quantity && change > 0) {
+              toast.warning(`Maximum quantity reached for ${item.seedling_type}`);
+            }
+            
+            return { ...item, quantity: newQuantity };
+          }
+          return item;
+        })
         .filter((item) => item.quantity > 0)
     );
   };

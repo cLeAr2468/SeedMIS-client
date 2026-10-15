@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import requestService from '@/services/requestService';
 import EditRequestModal from './EditRequestModal';
+import CancelRequestDialog from './CancelRequestDialog';
 
 const statusConfig = {
   Pending: {
@@ -28,25 +29,31 @@ const statusConfig = {
     text: 'text-red-700',
     border: 'border-red-200',
   },
+  Cancelled: {
+    bg: 'bg-gray-100',
+    text: 'text-gray-700',
+    border: 'border-gray-200',
+  },
 };
 
 const OrderCard = ({ order, onOrderUpdated }) => {
   const config = statusConfig[order.status] || statusConfig.Pending;
   const [isCanceling, setIsCanceling] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showCancelDialog, setShowCancelDialog] = useState(false);
 
-  const handleCancel = async () => {
-    if (!confirm('Are you sure you want to cancel this request?')) return;
-
+  const handleCancel = async (orderId, reason) => {
     setIsCanceling(true);
     try {
-      const response = await requestService.cancelRequest(order.id);
+      const response = await requestService.cancelRequest(orderId, reason);
       if (response.success) {
-        toast.success('Request canceled successfully');
+        toast.success('Request cancelled successfully');
         if (onOrderUpdated) onOrderUpdated();
       }
     } catch (error) {
-      toast.error(error.message || 'Failed to cancel request');
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to cancel request';
+      toast.error(errorMessage);
+      throw error; // Re-throw to let dialog handle it
     } finally {
       setIsCanceling(false);
     }
@@ -112,6 +119,23 @@ const OrderCard = ({ order, onOrderUpdated }) => {
                     </span>
                   </div>
                 )}
+                
+                {/* Rejection Reason */}
+                {order.status === 'Rejected' && order.rejection_reason && (
+                  <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg">
+                    <p className="text-xs font-semibold text-red-700 mb-1">Rejection Reason:</p>
+                    <p className="text-xs text-red-600">{order.rejection_reason}</p>
+                  </div>
+                )}
+                
+                {/* Cancellation Reason */}
+                {order.status === 'Cancelled' && order.cancellation_reason && (
+                  <div className="mt-3 p-3 bg-gray-50 border border-gray-200 rounded-lg">
+                    <p className="text-xs font-semibold text-gray-700 mb-1">Cancellation Reason:</p>
+                    <p className="text-xs text-gray-600">{order.cancellation_reason}</p>
+                  </div>
+                )}
+                
                 <div className="flex items-center justify-between pt-2 border-t border-gray-100">
                   <span className="text-xs text-gray-500">Total:</span>
                   <span className="font-bold text-green-600">
@@ -133,7 +157,7 @@ const OrderCard = ({ order, onOrderUpdated }) => {
                     Edit
                   </Button>
                   <Button
-                    onClick={handleCancel}
+                    onClick={() => setShowCancelDialog(true)}
                     size="sm"
                     variant="outline"
                     disabled={isCanceling}
@@ -164,6 +188,16 @@ const OrderCard = ({ order, onOrderUpdated }) => {
           request={order}
           onClose={() => setShowEditModal(false)}
           onSuccess={handleEditSuccess}
+        />
+      )}
+
+      {/* Cancel Dialog */}
+      {showCancelDialog && (
+        <CancelRequestDialog
+          isOpen={showCancelDialog}
+          onClose={() => setShowCancelDialog(false)}
+          order={order}
+          onCancel={handleCancel}
         />
       )}
     </>

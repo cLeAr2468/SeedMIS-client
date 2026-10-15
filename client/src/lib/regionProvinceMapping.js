@@ -98,7 +98,11 @@ export const REGION_PROVINCE_MAPPING = {
     'SURIGAO DEL SUR'
   ],
   'NCR - National Capital Region': [
-    'METRO MANILA'
+    'NATIONAL CAPITAL REGION - MANILA',
+    'NATIONAL CAPITAL REGION - SECOND DISTRICT',
+    'NATIONAL CAPITAL REGION - THIRD DISTRICT',
+    'NATIONAL CAPITAL REGION - FOURTH DISTRICT',
+    'TAGUIG - PATEROS'
   ],
   'CAR - Cordillera Administrative Region': [
     'ABRA',

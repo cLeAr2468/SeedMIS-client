@@ -11,7 +11,7 @@ const DesktopSidebar = () => {
   const { user, logout } = useAuth();
 
   const navItems = [
-    { label: 'Dashboard', icon: Home, path: '/dashboard' },
+    { label: 'Home', icon: Home, path: '/dashboard' },
     { label: 'Browse Seedlings', icon: ShoppingBag, path: '/shop' },
     { label: 'My Request', icon: Package, path: '/orders' },
     { label: 'Settings', icon: User, path: '/profile' },
@@ -20,13 +20,46 @@ const DesktopSidebar = () => {
   const isActive = (path) => location.pathname === path;
 
   const handleLogout = async () => {
-    try {
-      await logout();
-      toast.success('Logged out successfully');
-      navigate('/login');
-    } catch (error) {
-      console.error('Logout error:', error);
-    }
+    toast((t) => (
+      <div className="flex flex-col gap-3">
+        <div>
+          <p className="font-semibold text-gray-900">Confirm Logout</p>
+          <p className="text-sm text-gray-600 mt-1">
+            Are you sure you want to log out?
+          </p>
+        </div>
+        <div className="flex gap-2">
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => toast.dismiss(t)}
+            className="flex-1"
+          >
+            Cancel
+          </Button>
+          <Button
+            size="sm"
+            variant="destructive"
+            onClick={async () => {
+              toast.dismiss(t);
+              try {
+                await logout();
+                toast.success('Logged out successfully');
+                navigate('/login');
+              } catch (error) {
+                console.error('Logout error:', error);
+                toast.error('Failed to logout');
+              }
+            }}
+            className="flex-1"
+          >
+            Yes, Logout
+          </Button>
+        </div>
+      </div>
+    ), {
+      duration: 10000,
+    });
   };
 
   return (

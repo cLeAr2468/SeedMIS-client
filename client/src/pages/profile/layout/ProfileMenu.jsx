@@ -1,21 +1,14 @@
 import { Card, CardContent } from '@/components/ui/card';
-import { User, Edit, History, LogOut, ChevronRight } from 'lucide-react';
+import { Home, History, LogOut, ChevronRight } from 'lucide-react';
 
-const ProfileMenu = ({ onViewProfile, onEditProfile, onOrderHistory, onLogout }) => {
+const ProfileMenu = ({ onDashboard, onOrderHistory, onLogout }) => {
   const menuItems = [
     {
-      label: 'View Profile',
-      icon: User,
-      onClick: onViewProfile,
+      label: 'Dashboard',
+      icon: Home,
+      onClick: onDashboard,
       color: 'text-blue-600',
       bg: 'bg-blue-50',
-    },
-    {
-      label: 'Edit Profile',
-      icon: Edit,
-      onClick: onEditProfile,
-      color: 'text-green-600',
-      bg: 'bg-green-50',
     },
     {
       label: 'Order History',
