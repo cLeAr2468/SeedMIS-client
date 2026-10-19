@@ -13,6 +13,7 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
+import { useCart } from '@/context/CartContext';
 import api from '@/services/api';
 import { toast } from 'sonner';
 import BottomNav from '@/components/layout/BottomNav';
@@ -24,6 +25,7 @@ import requestService from '@/services/requestService';
 const Dashboard = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { addToCart, totalItems, openCart } = useCart();
   const [requests, setRequests] = useState([]);
   const [newArrivals, setNewArrivals] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -68,10 +70,10 @@ const Dashboard = () => {
     }
   };
 
-  const addToCart = (seedling) => {
-    // Just navigate to shop for now
-    toast.success(`${seedling.seedling_type} - Go to shop to add to cart`);
-    navigate('/shop');
+  const addToCartHandler = (seedling) => {
+    addToCart(seedling);
+    // Optionally navigate to shop after adding
+    // navigate('/shop');
   };
 
   const stats = {
@@ -104,10 +106,13 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <DesktopSidebar />
+      <DesktopSidebar 
+        cartCount={totalItems}
+        onCartClick={openCart}
+      />
       <MobileHeader title="Home" />
 
-      <main className="lg:ml-64 pb-20 lg:pb-8">
+      <main className="pb-20 lg:pb-8">
         <div className="p-4 lg:p-8 max-w-7xl mx-auto">
           {/* Hero Section */}
           <div className="mb-8 lg:mb-12">
@@ -231,7 +236,7 @@ const Dashboard = () => {
                   <SeedlingCard
                     key={seedling.id}
                     seedling={seedling}
-                    onAddToCart={addToCart}
+                    onAddToCart={addToCartHandler}
                   />
                 ))}
               </div>

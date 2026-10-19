@@ -27,12 +27,16 @@ const SeedlingCard = ({ seedling, onAddToCart }) => {
     return `${baseUrl}/${seedling.image_url}`;
   };
 
-  // Determine classification based on seedling type
+  // Get classification from database (handle both 'Crafted' and 'Grafted')
   const getClassification = () => {
-    const type = seedling.seedling_type.toLowerCase();
-    if (type.includes('graft')) {
+    const dbClassification = seedling.classification;
+    
+    // If classification is 'Crafted' or 'Grafted', show as Grafted
+    if (dbClassification === 'Crafted' || dbClassification === 'Grafted') {
       return { label: 'Grafted', color: 'bg-purple-100 text-purple-700 border-purple-200' };
     }
+    
+    // Otherwise, show as Seedling
     return { label: 'Seedling', color: 'bg-blue-100 text-blue-700 border-blue-200' };
   };
 

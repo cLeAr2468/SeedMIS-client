@@ -1,13 +1,19 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
-import { Sprout, Loader2, Search, Filter } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Sprout, Loader2, Search, ShoppingCart } from 'lucide-react';
 import { Input } from '@/components/ui/input';
+import { toast } from 'sonner';
 import BottomNav from '@/components/layout/BottomNav';
 import MobileHeader from '@/components/layout/MobileHeader';
 import DesktopSidebar from '@/components/layout/DesktopSidebar';
 import requestService from '@/services/requestService';
+import { useCart } from '@/context/CartContext';
 
 const Home = () => {
+  const navigate = useNavigate();
+  const { addToCart, totalItems, openCart } = useCart();
   const [seedlings, setSeedlings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -41,7 +47,6 @@ const Home = () => {
   const SeedlingDisplayCard = ({ seedling }) => {
     const isLowStock = seedling.total_quantity <= 50;
     const isOutOfStock = seedling.total_quantity === 0;
-    const [imageError, setImageError] = useState(false);
 
     const getImageUrl = () => {
       if (!seedling.image_url) return null;
@@ -56,80 +61,100 @@ const Home = () => {
     };
 
     const imageUrl = getImageUrl();
-    const showImage = imageUrl && !imageError;
 
     return (
-      <Card className="overflow-hidden hover:shadow-lg transition-all duration-300 h-full flex flex-col group">
-        {/* Image Section */}
-        <div className="aspect-square bg-gradient-to-br from-green-50 to-emerald-50 flex items-center justify-center relative overflow-hidden">
-          {showImage ? (
-            <img
-              src={imageUrl}
+      <Card className="overflow-hidden hover:shadow-lg transition-all duration-300 hover:scale-[1.02] h-full flex flex-col rounded-xl">
+        {/* Image Section with Classification Badge */}
+        <div className="aspect-square relative overflow-hidden">
+          {imageUrl ? (
+            <img 
+              src={imageUrl} 
               alt={seedling.seedling_type}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-              onError={() => setImageError(true)}
+              onError={(e) => {
+                e.target.src = 'https://images.unsplash.com/photo-1530836369250-ef72a3f5cda8?w=400';
+              }}
+              className="w-full h-full object-cover"
             />
           ) : (
-            <Sprout className="w-20 h-20 lg:w-24 lg:h-24 text-green-600 group-hover:scale-110 transition-transform" />
-          )}
-          
-          {/* Stock Badge */}
-          {isOutOfStock && (
-            <div className="absolute top-0 left-0 right-0 bg-red-600 text-white text-xs py-2 text-center font-semibold">
-              OUT OF STOCK
+            <div className="w-full h-full bg-gradient-to-br from-green-50 via-emerald-50 to-green-100 flex items-center justify-center">
+              <Sprout className="w-20 h-20 lg:w-24 lg:h-24 text-green-600" />
             </div>
           )}
+          
+          {/* Classification Badge from Database - Top Left */}
+          <span className="absolute top-3 left-3 bg-blue-600 text-white text-xs font-semibold px-3 py-1.5 rounded-md">
+            {seedling.classification === 'Crafted' ? 'Grafted' : seedling.classification}
+          </span>
+
+          {/* Low Stock Badge - Top Right */}
           {isLowStock && !isOutOfStock && (
-            <span className="absolute top-3 right-3 bg-orange-500 text-white text-xs px-3 py-1 rounded-full font-semibold shadow-lg">
+            <span className="absolute top-3 right-3 bg-orange-500 text-white text-xs font-semibold px-3 py-1.5 rounded-md">
               Low Stock
             </span>
           )}
-          
-          {/* Stock Count Badge */}
-          {!isOutOfStock && (
-            <span className="absolute bottom-3 right-3 bg-white/90 backdrop-blur text-gray-900 text-xs px-3 py-1.5 rounded-full font-bold shadow-md">
-              {seedling.total_quantity?.toLocaleString()} available
-            </span>
-          )}
         </div>
-
+        
         {/* Content Section */}
-        <CardContent className="p-5 flex-1 flex flex-col">
-          <h3 className="font-bold text-gray-900 mb-3 text-base lg:text-lg line-clamp-2 min-h-[3rem] group-hover:text-green-700 transition-colors">
+        <CardContent className="p-5 flex-1 flex flex-col bg-white">
+          <h3 className="font-bold text-gray-900 mb-2 text-lg">
             {seedling.seedling_type}
           </h3>
-
-          <div className="mt-auto">
-            <div className="flex items-baseline justify-between mb-2">
-              <span className="text-sm text-gray-500">Price per unit</span>
+          
+          <p className="text-sm text-gray-600 mb-4 line-clamp-1">
+            {(seedling.classification === 'Grafted' || seedling.classification === 'Crafted') 
+              ? 'Grafted variety' 
+              : 'Healthy and high-yield variety'}
+          </p>
+          
+          <div className="space-y-2 mb-4">
+            <div className="flex items-center justify-between">
               <div className="flex items-baseline gap-1">
-                <span className="text-2xl font-bold text-green-600">
+                <span className="font-bold text-green-600 text-2xl">
                   ₱{parseFloat(seedling.price_per_unit).toFixed(2)}
                 </span>
+                <span className="text-sm text-gray-500">/ pc</span>
               </div>
             </div>
-
-            {/* Availability Status */}
-            <div className="pt-3 border-t border-gray-100">
-              <div className="flex items-center justify-center gap-2 text-sm">
-                {isOutOfStock ? (
-                  <>
-                    <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-                    <span className="text-red-600 font-medium">Currently Unavailable</span>
-                  </>
-                ) : isLowStock ? (
-                  <>
-                    <div className="w-2 h-2 bg-orange-500 rounded-full animate-pulse"></div>
-                    <span className="text-orange-600 font-medium">Limited Stock</span>
-                  </>
-                ) : (
-                  <>
-                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                    <span className="text-green-600 font-medium">In Stock</span>
-                  </>
-                )}
-              </div>
+            
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-600">Available:</span>
+              <span className={`text-sm font-semibold ${isLowStock && !isOutOfStock ? 'text-orange-600' : isOutOfStock ? 'text-red-600' : 'text-gray-900'}`}>
+                {seedling.total_quantity}
+              </span>
             </div>
+            
+            <div className="flex items-center justify-end">
+              <span className={`text-sm font-semibold ${isOutOfStock ? 'text-red-600' : 'text-green-600'}`}>
+                {isOutOfStock ? 'Out of Stock' : 'In Stock'}
+              </span>
+            </div>
+          </div>
+          
+          {/* Buttons */}
+          <div className="space-y-2 mt-auto">
+            <Button
+              className="w-full bg-green-700 hover:bg-green-800 text-white font-medium h-11"
+              onClick={() => addToCart(seedling)}
+              disabled={isOutOfStock}
+            >
+              <ShoppingCart className="w-4 h-4 mr-2" />
+              {isOutOfStock ? 'Out of Stock' : 'Add to Cart'}
+            </Button>
+            
+            <Button
+              variant="outline"
+              className="w-full border-green-700 text-green-700 hover:bg-green-50 font-medium h-11"
+              onClick={() => {
+                addToCart(seedling);
+                navigate('/orders');
+              }}
+              disabled={isOutOfStock}
+            >
+              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+              </svg>
+              Request
+            </Button>
           </div>
         </CardContent>
       </Card>
@@ -138,31 +163,53 @@ const Home = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <DesktopSidebar />
+      <DesktopSidebar 
+        cartCount={totalItems}
+        onCartClick={openCart}
+      />
       <MobileHeader title="Home" />
 
-      <main className="lg:ml-64 pb-20 lg:pb-8">
-        <div className="p-4 lg:p-8 max-w-7xl mx-auto">
-          {/* Hero Section */}
-          <div className="mb-8 lg:mb-10">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-12 h-12 bg-green-600 rounded-xl flex items-center justify-center shadow-lg">
-                <Sprout className="w-7 h-7 text-white" />
-              </div>
+      <main className="pb-20 lg:pb-8">
+        {/* Hero Banner */}
+        <div className="bg-gradient-to-br from-green-700 via-green-600 to-green-800 text-white relative overflow-hidden">
+          <div className="max-w-7xl mx-auto px-4 lg:px-8 py-8 lg:py-12 relative z-10">
+            <div className="grid lg:grid-cols-2 gap-8 items-center">
+              {/* Left Content */}
               <div>
-                <h1 className="text-3xl lg:text-4xl font-bold text-gray-900">
-                  Seedling Catalog
+                <h1 className="text-3xl lg:text-5xl font-bold mb-4 leading-tight">
+                  Grow a Greener Tomorrow
                 </h1>
-                <p className="text-gray-600 text-sm lg:text-base mt-1">
-                  Browse our complete collection of quality seedlings
+                <p className="text-lg lg:text-xl text-green-50 mb-6 leading-relaxed">
+                  Request and plant quality seedlings for a healthier and more sustainable future.
                 </p>
+              </div>
+              
+              {/* Right Image */}
+              <div className="hidden lg:flex items-center justify-center">
+                <div className="relative">
+                  <div className="w-64 h-64 bg-white/10 rounded-full absolute blur-3xl"></div>
+                  <svg className="w-64 h-64 relative z-10" viewBox="0 0 200 200" fill="none">
+                    {/* Seedling illustration */}
+                    <circle cx="100" cy="150" r="40" fill="#8B4513" opacity="0.6"/>
+                    <rect x="95" y="80" width="10" height="70" fill="#10B981" rx="2"/>
+                    <ellipse cx="85" cy="60" rx="25" ry="35" fill="#34D399" transform="rotate(-20 85 60)"/>
+                    <ellipse cx="115" cy="65" rx="25" ry="35" fill="#10B981" transform="rotate(20 115 65)"/>
+                    <ellipse cx="100" cy="45" rx="20" ry="30" fill="#34D399"/>
+                  </svg>
+                </div>
               </div>
             </div>
           </div>
+          
+          {/* Decorative circles */}
+          <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-32 -mt-32"></div>
+          <div className="absolute bottom-0 left-0 w-96 h-96 bg-white/5 rounded-full -ml-48 -mb-48"></div>
+        </div>
 
-          {/* Search Bar */}
-          <div className="mb-6">
-            <div className="relative max-w-md">
+        <div className="p-4 lg:p-8 max-w-7xl mx-auto">
+          {/* Search & View My Requests */}
+          <div className="mb-6 flex flex-col sm:flex-row gap-3">
+            <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
               <Input
                 type="text"
@@ -174,26 +221,14 @@ const Home = () => {
             </div>
           </div>
 
-          {/* Stats Bar */}
-          <div className="mb-8 p-4 bg-white rounded-lg shadow-sm border border-gray-200">
-            <div className="flex items-center justify-between flex-wrap gap-4">
-              <div>
-                <p className="text-sm text-gray-600 mb-1">Total Varieties</p>
-                <p className="text-2xl font-bold text-gray-900">{seedlings.length}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-600 mb-1">Available Now</p>
-                <p className="text-2xl font-bold text-green-600">
-                  {seedlings.filter(s => s.total_quantity > 0).length}
-                </p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-600 mb-1">Low Stock</p>
-                <p className="text-2xl font-bold text-orange-600">
-                  {seedlings.filter(s => s.total_quantity > 0 && s.total_quantity <= 50).length}
-                </p>
-              </div>
-            </div>
+          {/* Hero Section - Old title, now simplified */}
+          <div className="mb-6">
+            <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-2">
+              Available Seedlings
+            </h2>
+            <p className="text-gray-600">
+              {filteredSeedlings.length} {filteredSeedlings.length === 1 ? 'variety' : 'varieties'} available
+            </p>
           </div>
 
           {/* Seedlings Grid */}

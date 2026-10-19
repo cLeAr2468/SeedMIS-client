@@ -4,6 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { User, Mail, Building2, Phone, MapPin, Calendar, Edit, Lock } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
+import { useCart } from '@/context/CartContext';
 import { toast } from 'sonner';
 import BottomNav from '@/components/layout/BottomNav';
 import MobileHeader from '@/components/layout/MobileHeader';
@@ -15,6 +16,7 @@ import ChangePassword from './layout/ChangePassword';
 const Profile = () => {
   const navigate = useNavigate();
   const { user, logout, updateUser } = useAuth();
+  const { totalItems, openCart } = useCart();
   const [showEditProfile, setShowEditProfile] = useState(false);
   const [showChangePassword, setShowChangePassword] = useState(false);
   const [currentUser, setCurrentUser] = useState(user);
@@ -62,10 +64,13 @@ const Profile = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <DesktopSidebar />
+      <DesktopSidebar 
+        cartCount={totalItems}
+        onCartClick={openCart}
+      />
       <MobileHeader title="Profile" />
 
-      <main className="lg:ml-64 pb-20 lg:pb-8">
+      <main className="pb-20 lg:pb-8">
         <div className="p-4 lg:p-8">
           <div className="max-w-4xl mx-auto">
             {/* Enhanced Profile Header with Full Info */}

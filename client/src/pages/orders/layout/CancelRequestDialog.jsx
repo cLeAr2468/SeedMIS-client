@@ -52,11 +52,11 @@ const CancelRequestDialog = ({ isOpen, onClose, order, onCancel }) => {
 
   return (
     <div 
-      className="fixed inset-0 bg-black bg-opacity-20 z-40 flex items-center justify-center p-4"
+      className="fixed inset-0 isolate z-50 bg-black/10 duration-100 supports-backdrop-filter:backdrop-blur-xs flex items-center justify-center p-4"
       onClick={handleClose}
     >
       <div
-        className="bg-white rounded-lg shadow-xl max-w-lg w-full max-h-[90vh] overflow-y-auto"
+        className="bg-white rounded-lg shadow-xl w-full max-w-md max-h-[85vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         <Card className="border-0">

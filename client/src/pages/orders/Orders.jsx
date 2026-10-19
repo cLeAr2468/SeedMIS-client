@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Loader2, Package } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
+import { useCart } from '@/context/CartContext';
 import { toast } from 'sonner';
 import api from '@/services/api';
 import BottomNav from '@/components/layout/BottomNav';
@@ -10,7 +12,9 @@ import OrderCard from './layout/OrderCard';
 import OrderFilters from './layout/OrderFilters';
 
 const Orders = () => {
+  const navigate = useNavigate();
   const { user } = useAuth();
+  const { totalItems, openCart } = useCart();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedStatus, setSelectedStatus] = useState('All');
@@ -47,10 +51,13 @@ const Orders = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <DesktopSidebar />
+      <DesktopSidebar 
+        cartCount={totalItems}
+        onCartClick={openCart}
+      />
       <MobileHeader title="My Orders" />
 
-      <main className="lg:ml-64 pb-20 lg:pb-8">
+      <main className="pb-20 lg:pb-8">
         {/* Filters */}
         <div className="bg-white border-b p-4 sticky top-14 lg:top-0 z-30">
           <div className="max-w-7xl mx-auto">
