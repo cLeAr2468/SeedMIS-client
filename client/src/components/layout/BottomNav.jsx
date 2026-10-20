@@ -7,7 +7,7 @@ const BottomNav = () => {
   const location = useLocation();
 
   const navItems = [
-    { label: 'Home', icon: Home, path: '/dashboard' },
+    { label: 'Dashboard', icon: Home, path: '/dashboard' },
     { label: 'Shop', icon: ShoppingBag, path: '/shop' },
     { label: 'Requested', icon: Package, path: '/orders' },
     { label: 'Settings', icon: User, path: '/profile' },

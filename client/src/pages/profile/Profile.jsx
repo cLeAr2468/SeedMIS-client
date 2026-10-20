@@ -68,7 +68,11 @@ const Profile = () => {
         cartCount={totalItems}
         onCartClick={openCart}
       />
-      <MobileHeader title="Profile" />
+      <MobileHeader 
+        title="Profile"
+        cartCount={totalItems}
+        onCartClick={openCart}
+      />
 
       <main className="pb-20 lg:pb-8">
         <div className="p-4 lg:p-8">

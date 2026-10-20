@@ -78,14 +78,11 @@ export const REGION_PROVINCE_MAPPING = {
     'MISAMIS ORIENTAL'
   ],
   'Region XI - Davao Region': [
-    'DAVAO DE ORO',
-    'DAVAO DEL NORTE',
     'DAVAO DEL SUR',
     'DAVAO OCCIDENTAL',
     'DAVAO ORIENTAL'
   ],
   'Region XII - SOCCSKSARGEN': [
-    'COTABATO',
     'SARANGANI',
     'SOUTH COTABATO',
     'SULTAN KUDARAT'

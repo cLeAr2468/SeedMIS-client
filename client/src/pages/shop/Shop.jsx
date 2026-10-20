@@ -12,6 +12,7 @@ import BottomNav from '@/components/layout/BottomNav';
 import MobileHeader from '@/components/layout/MobileHeader';
 import DesktopSidebar from '@/components/layout/DesktopSidebar';
 import CategoryFilter from './layout/CategoryFilter';
+import QuickRequestDialog from './layout/QuickRequestDialog';
 
 const Shop = () => {
   const navigate = useNavigate();
@@ -21,6 +22,8 @@ const Shop = () => {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
+  const [selectedSeedling, setSelectedSeedling] = useState(null);
+  const [showRequestDialog, setShowRequestDialog] = useState(false);
 
   useEffect(() => {
     fetchSeedlings();
@@ -48,11 +51,15 @@ const Shop = () => {
 
     let matchesCategory = true;
     if (selectedCategory !== 'All') {
-      const typeContains = seedling.seedling_type.toLowerCase();
+      // Check classification field instead of seedling_type
+      const classification = seedling.classification?.toLowerCase() || '';
+      
       if (selectedCategory === 'Grafted') {
-        matchesCategory = typeContains.includes('graft');
+        // Match if classification is "Grafted" or "Crafted" (typo variant)
+        matchesCategory = classification === 'grafted' || classification === 'crafted';
       } else if (selectedCategory === 'Seedling') {
-        matchesCategory = !typeContains.includes('graft');
+        // Match if classification is NOT grafted/crafted
+        matchesCategory = classification !== 'grafted' && classification !== 'crafted';
       }
     }
 
@@ -154,7 +161,7 @@ const Shop = () => {
                 <p className="text-gray-600">No seedlings found</p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 lg:gap-6">
+              <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 lg:gap-6">
                 {filteredSeedlings.map((seedling) => {
                   const isLowStock = seedling.total_quantity <= 50;
                   const isOutOfStock = seedling.total_quantity === 0;
@@ -176,9 +183,9 @@ const Shop = () => {
                   };
                   
                   return (
-                    <Card key={seedling.id} className="overflow-hidden hover:shadow-lg transition-all duration-300 h-full flex flex-col rounded-xl">
-                      {/* Image Section with Classification Badge */}
-                      <div className="aspect-square relative overflow-hidden">
+                    <Card key={seedling.id} className="overflow-hidden hover:shadow-md transition-shadow">
+                      {/* Responsive Image Section */}
+                      <div className="relative h-32 lg:h-44 bg-gray-100">
                         <img
                           src={getSeedlingImage()}
                           alt={seedling.seedling_type}
@@ -188,77 +195,64 @@ const Shop = () => {
                           className="w-full h-full object-cover"
                         />
                         
-                        {/* Classification Badge - Top Left (from database) */}
-                        <span className="absolute top-3 left-3 bg-blue-600 text-white text-xs font-semibold px-3 py-1.5 rounded-md">
+                        {/* Classification Badge */}
+                        <span className="absolute top-1.5 left-1.5 lg:top-2 lg:left-2 bg-green-800 text-white text-[10px] lg:text-xs font-semibold px-1.5 py-0.5 lg:px-2 lg:py-1 rounded">
                           {seedling.classification === 'Crafted' ? 'Grafted' : seedling.classification}
                         </span>
 
-                        {/* Low Stock Badge - Top Right */}
+                        {/* Low Stock Badge */}
                         {isLowStock && !isOutOfStock && (
-                          <span className="absolute top-3 right-3 bg-orange-500 text-white text-xs font-semibold px-3 py-1.5 rounded-md">
+                          <span className="absolute top-1.5 right-1.5 lg:top-2 lg:right-2 bg-orange-500 text-white text-[10px] lg:text-xs font-semibold px-1.5 py-0.5 lg:px-2 lg:py-1 rounded">
                             Low Stock
                           </span>
                         )}
                       </div>
                       
-                      {/* Content Section */}
-                      <CardContent className="p-5 flex-1 flex flex-col bg-white">
-                        <h3 className="font-bold text-gray-900 mb-2 text-lg">
+                      {/* Responsive Content */}
+                      <CardContent className="p-2.5 lg:p-4">
+                        <h3 className="font-bold text-gray-900 text-xs lg:text-base leading-tight mb-0.5 lg:mb-1">
                           {seedling.seedling_type}
                         </h3>
                         
-                        <p className="text-sm text-gray-600 mb-4 line-clamp-1">
-                          {(seedling.classification === 'Grafted' || seedling.classification === 'Crafted') 
-                            ? 'Grafted variety' 
-                            : 'Healthy and high-yield variety'}
+                        <p className="text-[10px] lg:text-sm text-gray-600 mb-1.5 lg:mb-2">
+                          Available: <span className="font-semibold">{seedling.total_quantity}</span> pcs
                         </p>
                         
-                        <div className="space-y-2 mb-4">
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-baseline gap-1">
-                              <span className="font-bold text-green-600 text-2xl">
-                                ₱{parseFloat(seedling.price_per_unit).toFixed(2)}
-                              </span>
-                              <span className="text-sm text-gray-500">/ pc</span>
-                            </div>
-                          </div>
-                          
-                          <div className="flex items-center justify-between">
-                            <span className="text-sm text-gray-600">Available:</span>
-                            <span className={`text-sm font-semibold ${isLowStock && !isOutOfStock ? 'text-orange-600' : isOutOfStock ? 'text-red-600' : 'text-gray-900'}`}>
-                              {seedling.total_quantity}
+                        {/* Price and Stock Status */}
+                        <div className="flex items-center justify-between mb-2 lg:mb-3">
+                          <div className="flex items-baseline gap-0.5 lg:gap-1">
+                            <span className="font-bold text-green-600 text-sm lg:text-lg">
+                              ₱{parseFloat(seedling.price_per_unit).toFixed(2)}
                             </span>
+                            <span className="text-[9px] lg:text-xs text-gray-400">/ pc</span>
                           </div>
-                          
-                          <div className="flex items-center justify-end">
-                            <span className={`text-sm font-semibold ${isOutOfStock ? 'text-red-600' : 'text-green-600'}`}>
-                              {isOutOfStock ? 'Out of Stock' : 'In Stock'}
-                            </span>
-                          </div>
+                          <span className={`text-[10px] lg:text-sm font-semibold ${isOutOfStock ? 'text-red-600' : 'text-green-600'}`}>
+                            {isOutOfStock ? 'Out of Stock' : 'In Stock'}
+                          </span>
                         </div>
                         
-                        {/* Buttons */}
-                        <div className="space-y-2 mt-auto">
+                        {/* Compact Buttons */}
+                        <div className="space-y-1.5 lg:space-y-2">
                           <Button
-                            className="w-full bg-green-700 hover:bg-green-800 text-white font-medium h-11"
+                            className="w-full bg-green-700 hover:bg-green-800 text-white font-medium h-8 lg:h-10 text-[11px] lg:text-sm"
                             onClick={() => addToCart(seedling)}
                             disabled={isOutOfStock}
                           >
-                            <ShoppingCart className="w-4 h-4 mr-2" />
+                            <ShoppingCart className="w-3 lg:w-4 h-3 lg:h-4 mr-1" />
                             {isOutOfStock ? 'Out of Stock' : 'Add to Cart'}
                           </Button>
                           
                           <Button
                             variant="outline"
-                            className="w-full border-green-700 text-green-700 hover:bg-green-50 font-medium h-11"
+                            className="w-full border-green-700 text-green-700 hover:bg-green-50 font-medium h-8 lg:h-10 text-[11px] lg:text-sm"
                             onClick={() => {
-                              addToCart(seedling);
-                              navigate('/orders');
+                              setSelectedSeedling(seedling);
+                              setShowRequestDialog(true);
                             }}
                             disabled={isOutOfStock}
                           >
-                            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                            <svg className="w-3 lg:w-4 h-3 lg:h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 0 012 2" />
                             </svg>
                             Request
                           </Button>
@@ -274,6 +268,16 @@ const Shop = () => {
       </main>
 
       <BottomNav />
+
+      {/* Quick Request Dialog */}
+      <QuickRequestDialog
+        isOpen={showRequestDialog}
+        onClose={() => {
+          setShowRequestDialog(false);
+          setSelectedSeedling(null);
+        }}
+        seedling={selectedSeedling}
+      />
     </div>
   );
 };

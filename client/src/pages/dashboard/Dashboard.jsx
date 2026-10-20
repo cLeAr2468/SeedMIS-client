@@ -3,6 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from '@/components/ui/carousel';
+import {
   Sprout,
   Package,
   Clock,
@@ -110,7 +117,11 @@ const Dashboard = () => {
         cartCount={totalItems}
         onCartClick={openCart}
       />
-      <MobileHeader title="Home" />
+      <MobileHeader 
+        title="Dashboard"
+        cartCount={totalItems}
+        onCartClick={openCart}
+      />
 
       <main className="pb-20 lg:pb-8">
         <div className="p-4 lg:p-8 max-w-7xl mx-auto">
@@ -199,7 +210,7 @@ const Dashboard = () => {
             </CardContent>
           </Card>
 
-          {/* New Arrivals Section */}
+          {/* New Arrivals Section with Carousel */}
           <div className="mb-8 lg:mb-12">
             <div className="flex items-center justify-between mb-6">
               <div>
@@ -231,26 +242,52 @@ const Dashboard = () => {
                 <p>No new arrivals at the moment</p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 lg:gap-6">
-                {newArrivals.map((seedling) => (
-                  <SeedlingCard
-                    key={seedling.id}
-                    seedling={seedling}
-                    onAddToCart={addToCartHandler}
-                  />
-                ))}
-              </div>
-            )}
+              <>
+                {/* Embla Carousel */}
+                <Carousel
+                  opts={{
+                    align: 'start',
+                    loop: false,
+                    slidesToScroll: 1,
+                  }}
+                  className="w-full"
+                >
+                  <CarouselContent className="-ml-2 md:-ml-4">
+                    {newArrivals.map((seedling) => (
+                      <CarouselItem
+                        key={seedling.id}
+                        className="pl-2 md:pl-4 basis-[85%] sm:basis-1/2 lg:basis-1/3 xl:basis-1/4"
+                      >
+                        <SeedlingCard
+                          seedling={seedling}
+                          onAddToCart={addToCartHandler}
+                        />
+                      </CarouselItem>
+                    ))}
+                  </CarouselContent>
+                  
+                  {/* Navigation Buttons */}
+                  <CarouselPrevious className="hidden lg:flex -left-4 bg-white hover:bg-gray-100 shadow-lg" />
+                  <CarouselNext className="hidden lg:flex -right-4 bg-white hover:bg-gray-100 shadow-lg" />
+                </Carousel>
 
-            <div className="mt-6 text-center lg:hidden">
-              <Button
-                variant="outline"
-                onClick={() => navigate('/shop')}
-                className="w-full border-green-600 text-green-600"
-              >
-                View All Seedlings
-              </Button>
-            </div>
+                {/* Mobile scroll hint */}
+                <div className="lg:hidden text-center mt-3">
+                  <p className="text-xs text-gray-500">← Swipe to see more →</p>
+                </div>
+
+                {/* View All Button - Mobile */}
+                <div className="mt-6 text-center lg:hidden">
+                  <Button
+                    variant="outline"
+                    onClick={() => navigate('/shop')}
+                    className="w-full border-green-600 text-green-600"
+                  >
+                    View All Seedlings
+                  </Button>
+                </div>
+              </>
+            )}
           </div>
 
           {/* Recent Requests Section */}

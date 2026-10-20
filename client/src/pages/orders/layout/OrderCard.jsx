@@ -125,6 +125,17 @@ const OrderCard = ({ order, onOrderUpdated }) => {
                   <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg">
                     <p className="text-xs font-semibold text-red-700 mb-1">Rejection Reason:</p>
                     <p className="text-xs text-red-600">{order.rejection_reason}</p>
+                    {order.rejected_at && (
+                      <p className="text-xs text-red-500 mt-2">
+                        Rejected on: {new Date(order.rejected_at).toLocaleDateString('en-US', {
+                          month: 'short',
+                          day: 'numeric',
+                          year: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })}
+                      </p>
+                    )}
                   </div>
                 )}
                 
@@ -133,6 +144,33 @@ const OrderCard = ({ order, onOrderUpdated }) => {
                   <div className="mt-3 p-3 bg-gray-50 border border-gray-200 rounded-lg">
                     <p className="text-xs font-semibold text-gray-700 mb-1">Cancellation Reason:</p>
                     <p className="text-xs text-gray-600">{order.cancellation_reason}</p>
+                    {order.cancelled_at && (
+                      <p className="text-xs text-gray-500 mt-2">
+                        Cancelled on: {new Date(order.cancelled_at).toLocaleDateString('en-US', {
+                          month: 'short',
+                          day: 'numeric',
+                          year: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })}
+                      </p>
+                    )}
+                  </div>
+                )}
+
+                {/* Released Date */}
+                {order.status === 'Released' && order.released_at && (
+                  <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-lg">
+                    <p className="text-xs font-semibold text-green-700 mb-1">Released Date:</p>
+                    <p className="text-xs text-green-600">
+                      {new Date(order.released_at).toLocaleDateString('en-US', {
+                        month: 'short',
+                        day: 'numeric',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      })}
+                    </p>
                   </div>
                 )}
                 

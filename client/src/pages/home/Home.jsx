@@ -167,7 +167,11 @@ const Home = () => {
         cartCount={totalItems}
         onCartClick={openCart}
       />
-      <MobileHeader title="Home" />
+      <MobileHeader 
+        title="Home"
+        cartCount={totalItems}
+        onCartClick={openCart}
+      />
 
       <main className="pb-20 lg:pb-8">
         {/* Hero Banner */}

@@ -265,7 +265,7 @@ const Register = () => {
                   <Input
                     id="first_name"
                     name="first_name"
-                    placeholder="JUAN"
+                    placeholder="Enter First Name"
                     value={formData.first_name}
                     onChange={handleInputChange}
                     disabled={loading}
@@ -282,7 +282,7 @@ const Register = () => {
                   <Input
                     id="middle_name"
                     name="middle_name"
-                    placeholder="DELA"
+                    placeholder="Enter Middle Name"
                     value={formData.middle_name}
                     onChange={handleInputChange}
                     disabled={loading}
@@ -299,7 +299,7 @@ const Register = () => {
                   <Input
                     id="last_name"
                     name="last_name"
-                    placeholder="CRUZ"
+                    placeholder="Enter Last Name"
                     value={formData.last_name}
                     onChange={handleInputChange}
                     disabled={loading}
@@ -343,7 +343,7 @@ const Register = () => {
                     id="email"
                     name="email"
                     type="email"
-                    placeholder="juan.delacruz@example.com"
+                    placeholder="Enter Email"
                     value={formData.email}
                     onChange={handleInputChange}
                     disabled={loading}
