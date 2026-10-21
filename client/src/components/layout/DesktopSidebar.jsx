@@ -19,7 +19,7 @@ const DesktopSidebar = ({ cartCount = 0, onCartClick }) => {
 
   const navItems = [
     { label: 'Dashboard', path: '/dashboard', icon: Home },
-    { label: 'Browse Seeds', path: '/shop', icon: ShoppingBag },
+    { label: 'Browse Seedling', path: '/shop', icon: ShoppingBag },
     { label: 'My Requests', path: '/orders', icon: Package },
   ];
 
