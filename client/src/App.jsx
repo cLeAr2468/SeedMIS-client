@@ -17,6 +17,7 @@ import Orders from './pages/orders/Orders';
 import Profile from './pages/profile/Profile';
 import Notifications from './pages/notifications/Notifications';
 
+
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
