@@ -48,19 +48,19 @@ const Login = () => {
 
   return (
     <div 
-      className="min-h-screen flex items-center justify-center p-4 bg-cover bg-center bg-no-repeat relative"
-      style={{ backgroundImage: `url(${bgLogs})` }}
+      className="min-h-screen flex items-center justify-center bg-white md:bg-cover md:bg-center md:bg-no-repeat relative p-0 md:p-4"
+      style={{ backgroundImage: window.innerWidth >= 768 ? `url(${bgLogs})` : 'none' }}
     >
-      {/* Dark Overlay */}
-      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+      {/* Dark Overlay - Desktop only */}
+      <div className="hidden md:block absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
 
-      <div className="w-full max-w-md relative z-10">
+      <div className="w-full h-full md:h-auto md:max-w-md relative z-10">
         {/* Login Card */}
-        <Card className="shadow-2xl border-none bg-white/95 backdrop-blur-md">
-          <CardHeader className="space-y-4 pb-6">
+        <Card className="h-full md:h-auto border-none md:shadow-2xl bg-white md:bg-white/95 md:backdrop-blur-md rounded-none md:rounded-lg">
+          <CardHeader className="space-y-4 pb-6 px-4 sm:px-6">
             {/* Logo and Branding inside card */}
-            <div className="flex flex-col items-center space-y-3">
-              <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center shadow-xl p-2 ring-4 ring-green-600/20">
+            <div className="flex flex-col items-center space-y-3 pt-8 md:pt-4">
+              <div className="w-16 h-16 md:w-20 md:h-20 bg-white rounded-full flex items-center justify-center shadow-xl p-2 ring-4 ring-green-600/20">
                 <img
                   src={logo}
                   alt="SeedMIS Logo"
@@ -68,18 +68,18 @@ const Login = () => {
                 />
               </div>
               <div className="text-center">
-                <h1 className="text-3xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
+                <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
                   SeedMIS
                 </h1>
                 <p className="text-green-700 font-medium mt-1">Client Portal</p>
-                <p className="text-gray-600 text-sm mt-0.5">San Jorge Experiment Station</p>
+                <p className="text-gray-600 text-xs md:text-sm mt-0.5">San Jorge Experiment Station</p>
               </div>
             </div>
-            <CardDescription className="text-center pt-2">
+            <CardDescription className="text-center pt-2 text-sm md:text-base">
               Sign in to your client account
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="px-4 sm:px-6">
             <form onSubmit={handleSubmit} className="space-y-4">
               {/* Email */}
               <div className="space-y-2">
@@ -166,11 +166,6 @@ const Login = () => {
             </div>
           </CardContent>
         </Card>
-
-        {/* Footer */}
-        <p className="text-center text-sm text-white/70 mt-8 drop-shadow">
-          © 2026 SeedMIS. All rights reserved.
-        </p>
       </div>
     </div>
   );

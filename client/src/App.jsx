@@ -15,6 +15,7 @@ import Home from './pages/home/Home';
 import Shop from './pages/shop/Shop';
 import Orders from './pages/orders/Orders';
 import Profile from './pages/profile/Profile';
+import Notifications from './pages/notifications/Notifications';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -122,6 +123,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <Profile />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/notifications"
+              element={
+                <ProtectedRoute>
+                  <Notifications />
                 </ProtectedRoute>
               }
             />

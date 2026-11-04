@@ -204,19 +204,20 @@ const Register = () => {
 
   return (
     <div 
-      className="min-h-screen py-8 px-4 bg-cover bg-center bg-no-repeat relative"
-      style={{ backgroundImage: `url(${bgLogs})` }}
+      className="min-h-screen bg-white md:bg-cover md:bg-center md:bg-no-repeat md:bg-fixed relative overflow-auto"
+      style={{ backgroundImage: window.innerWidth >= 768 ? `url(${bgLogs})` : 'none' }}
     >
-      {/* Dark Overlay */}
-      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+      {/* Dark Overlay - Desktop only */}
+      <div className="hidden md:block absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
 
-      <div className="max-w-4xl mx-auto relative z-10">
+      {/* Container - Full width on mobile, centered on desktop */}
+      <div className="w-full md:max-w-2xl lg:max-w-3xl md:mx-auto relative z-10 min-h-screen md:min-h-0 md:py-8">
         {/* Registration Form */}
-        <Card className="shadow-2xl border-none bg-white/95 backdrop-blur-md">
-          <CardHeader className="space-y-4 pb-6">
+        <Card className="h-full md:h-auto border-none md:shadow-2xl bg-white md:bg-white/95 md:backdrop-blur-md rounded-none md:rounded-lg">
+          <CardHeader className="space-y-4 pb-6 px-4 sm:px-6">
             {/* Logo and Branding inside card */}
-            <div className="flex flex-col items-center space-y-3">
-              <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center shadow-xl p-2 ring-4 ring-green-600/20">
+            <div className="flex flex-col items-center space-y-3 pt-4 md:pt-0">
+              <div className="w-16 h-16 md:w-20 md:h-20 bg-white rounded-full flex items-center justify-center shadow-xl p-2 ring-4 ring-green-600/20">
                 <img
                   src={logo}
                   alt="SeedMIS Logo"
@@ -224,22 +225,22 @@ const Register = () => {
                 />
               </div>
               <div className="text-center">
-                <h1 className="text-3xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
+                <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
                   SeedMIS
                 </h1>
                 <p className="text-green-700 font-medium mt-1">Client Portal</p>
-                <p className="text-gray-600 text-sm mt-0.5">San Jorge Experiment Station</p>
+                <p className="text-gray-600 text-xs md:text-sm mt-0.5">San Jorge Experiment Station</p>
               </div>
             </div>
             <div className="text-center pt-2">
-              <CardTitle className="text-2xl font-bold text-gray-800">Create Account</CardTitle>
-              <CardDescription className="mt-2">
+              <CardTitle className="text-xl md:text-2xl font-bold text-gray-800">Create Account</CardTitle>
+              <CardDescription className="mt-2 text-sm">
                 Please fill in all the required information to create your account
               </CardDescription>
             </div>
           </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-6">
+          <CardContent className="overflow-y-auto px-4 sm:px-6 md:max-h-[60vh]">
+            <form onSubmit={handleSubmit} className="space-y-6 pb-6">
               {/* Organization */}
               <div className="space-y-2">
                 <Label htmlFor="organization">Organization *</Label>
@@ -504,6 +505,33 @@ const Register = () => {
                 </div>
               </div>
 
+              {/* Privacy Notice */}
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 space-y-2">
+                <div className="flex items-start gap-2">
+                  <svg 
+                    className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" 
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24"
+                  >
+                    <path 
+                      strokeLinecap="round" 
+                      strokeLinejoin="round" 
+                      strokeWidth={2} 
+                      d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" 
+                    />
+                  </svg>
+                  <div className="flex-1">
+                    <h4 className="font-semibold text-blue-900 text-sm mb-1">Privacy & Data Security Notice</h4>
+                    <p className="text-xs text-blue-800 leading-relaxed">
+                      Your personal information is encrypted and securely stored in compliance with the Data Privacy Act of 2012 (RA 10173). 
+                      We collect only necessary data for seedling distribution purposes. Your information will not be shared with third parties 
+                      without your explicit consent. By creating an account, you acknowledge that you have read and understood our data privacy policy.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
               {/* Submit Button */}
               <Button
                 type="submit"
@@ -530,11 +558,6 @@ const Register = () => {
             </form>
           </CardContent>
         </Card>
-
-        {/* Footer */}
-        <p className="text-center text-sm text-white/70 mt-8 drop-shadow">
-          © 2026 SeedMIS. All rights reserved.
-        </p>
       </div>
     </div>
   );

@@ -45,21 +45,20 @@ const Shop = () => {
   const categories = ['All', 'Seedling', 'Grafted'];
 
   const filteredSeedlings = seedlings.filter((seedling) => {
-    const matchesSearch = seedling.seedling_type
+    // PURE RELATIONSHIP - use seedlingType only
+    const seedlingName = seedling.seedlingType?.name || '';
+    const matchesSearch = seedlingName
       .toLowerCase()
       .includes(searchQuery.toLowerCase());
 
     let matchesCategory = true;
     if (selectedCategory !== 'All') {
-      // Check classification field instead of seedling_type
-      const classification = seedling.classification?.toLowerCase() || '';
+      const classification = seedling.seedlingType?.classification?.toLowerCase() || '';
       
       if (selectedCategory === 'Grafted') {
-        // Match if classification is "Grafted" or "Crafted" (typo variant)
-        matchesCategory = classification === 'grafted' || classification === 'crafted';
+        matchesCategory = classification === 'grafted';
       } else if (selectedCategory === 'Seedling') {
-        // Match if classification is NOT grafted/crafted
-        matchesCategory = classification !== 'grafted' && classification !== 'crafted';
+        matchesCategory = classification === 'seedling';
       }
     }
 
@@ -166,19 +165,19 @@ const Shop = () => {
                   const isLowStock = seedling.total_quantity <= 50;
                   const isOutOfStock = seedling.total_quantity === 0;
                   
-                  // Get actual seedling image or use real seedling photo from Unsplash
+                  // Get seedling image from relationship - PURE
                   const getSeedlingImage = () => {
-                    if (seedling.image_url) {
-                      if (seedling.image_url.startsWith('http')) {
-                        return seedling.image_url;
+                    const imageUrl = seedling.seedlingType?.image_url;
+                    if (imageUrl) {
+                      if (imageUrl.startsWith('http')) {
+                        return imageUrl;
                       }
                       const isProduction = window.location.hostname !== 'localhost';
                       const baseUrl = isProduction 
                         ? 'https://seedmis-server-production.up.railway.app'
                         : 'http://localhost:8000';
-                      return `${baseUrl}/${seedling.image_url}`;
+                      return `${baseUrl}/${imageUrl}`;
                     }
-                    // Fallback to real seedling images
                     return 'https://images.unsplash.com/photo-1530836369250-ef72a3f5cda8?w=400';
                   };
                   
@@ -188,7 +187,7 @@ const Shop = () => {
                       <div className="relative h-32 lg:h-44 bg-gray-100">
                         <img
                           src={getSeedlingImage()}
-                          alt={seedling.seedling_type}
+                          alt={seedling.seedlingType?.name || seedling.seedling_type}
                           onError={(e) => {
                             e.target.src = 'https://images.unsplash.com/photo-1530836369250-ef72a3f5cda8?w=400';
                           }}
@@ -197,7 +196,7 @@ const Shop = () => {
                         
                         {/* Classification Badge */}
                         <span className="absolute top-1.5 left-1.5 lg:top-2 lg:left-2 bg-green-800 text-white text-[10px] lg:text-xs font-semibold px-1.5 py-0.5 lg:px-2 lg:py-1 rounded">
-                          {seedling.classification === 'Crafted' ? 'Grafted' : seedling.classification}
+                          {seedling.seedlingType?.classification || 'N/A'}
                         </span>
 
                         {/* Low Stock Badge */}
@@ -211,7 +210,7 @@ const Shop = () => {
                       {/* Responsive Content */}
                       <CardContent className="p-2.5 lg:p-4">
                         <h3 className="font-bold text-gray-900 text-xs lg:text-base leading-tight mb-0.5 lg:mb-1">
-                          {seedling.seedling_type}
+                          {seedling.seedlingType?.name || 'Unknown Seedling'}
                         </h3>
                         
                         <p className="text-[10px] lg:text-sm text-gray-600 mb-1.5 lg:mb-2">
