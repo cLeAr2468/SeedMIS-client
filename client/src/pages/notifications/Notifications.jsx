@@ -15,9 +15,18 @@ const Notifications = () => {
 
     const fetchNotifications = async () => {
         try {
+            console.log('Fetching notifications...');
             const response = await notificationService.getAllNotifications();
+            console.log('Notifications response:', response);
+            
             if (response.success) {
                 setNotifications(response.data || []);
+                console.log('Notifications set:', response.data);
+            } else {
+                console.error('Response not successful:', response);
+                toast.error('Failed to load notifications', {
+                    description: response.message || 'Server returned unsuccessful response'
+                });
             }
         } catch (error) {
             console.error('Failed to fetch notifications:', error);
@@ -222,6 +231,35 @@ const Notifications = () => {
                                         <p className="text-sm text-gray-600 mt-1">
                                             {notification.message}
                                         </p>
+                                        
+                                        {/* Display seedling type info from relationship */}
+                                        {notification.request?.inventory?.seedling_type && (
+                                            <div className="mt-2 flex items-center gap-2 text-xs">
+                                                <span className="inline-flex items-center px-2 py-1 rounded-full bg-green-50 text-green-700 border border-green-200">
+                                                    {notification.request.inventory.seedling_type}
+                                                </span>
+                                                <span className="text-gray-600">
+                                                    Qty: {notification.request.quantity}
+                                                </span>
+                                            </div>
+                                        )}
+                                        
+                                        {/* Display rejection reason if available */}
+                                        {notification.request?.rejection_reason && (
+                                            <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded">
+                                                <p className="text-xs font-semibold text-red-700">Rejection Reason:</p>
+                                                <p className="text-xs text-red-600 mt-0.5">{notification.request.rejection_reason}</p>
+                                            </div>
+                                        )}
+                                        
+                                        {/* Display cancellation reason if available */}
+                                        {notification.request?.cancellation_reason && (
+                                            <div className="mt-2 p-2 bg-gray-50 border border-gray-200 rounded">
+                                                <p className="text-xs font-semibold text-gray-700">Cancellation Reason:</p>
+                                                <p className="text-xs text-gray-600 mt-0.5">{notification.request.cancellation_reason}</p>
+                                            </div>
+                                        )}
+                                        
                                         <p className="text-xs text-gray-400 mt-2">
                                             {formatDistanceToNow(new Date(notification.created_at), {
                                                 addSuffix: true,

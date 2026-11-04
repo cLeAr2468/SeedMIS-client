@@ -4,7 +4,21 @@ const notificationService = {
     // Get all notifications
     getAllNotifications: async () => {
         try {
-            const response = await api.get('/notifications');
+            // Get user info from localStorage
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            const userId = user.id;
+            const userType = 'client'; // Client-side always uses 'client' type
+            
+            if (!userId) {
+                throw new Error('User not authenticated');
+            }
+            
+            const response = await api.get('/notifications', {
+                params: {
+                    user_id: userId,
+                    user_type: userType
+                }
+            });
             return response.data;
         } catch (error) {
             throw error.response?.data || { success: false, message: 'Failed to fetch notifications' };
@@ -14,7 +28,21 @@ const notificationService = {
     // Get unread count
     getUnreadCount: async () => {
         try {
-            const response = await api.get('/notifications/unread-count');
+            // Get user info from localStorage
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            const userId = user.id;
+            const userType = 'client'; // Client-side always uses 'client' type
+            
+            if (!userId) {
+                throw new Error('User not authenticated');
+            }
+            
+            const response = await api.get('/notifications/unread-count', {
+                params: {
+                    user_id: userId,
+                    user_type: userType
+                }
+            });
             return response.data;
         } catch (error) {
             throw error.response?.data || { success: false, message: 'Failed to fetch unread count' };
@@ -34,7 +62,19 @@ const notificationService = {
     // Mark all as read
     markAllAsRead: async () => {
         try {
-            const response = await api.post('/notifications/read-all');
+            // Get user info from localStorage
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            const userId = user.id;
+            const userType = 'client'; // Client-side always uses 'client' type
+            
+            if (!userId) {
+                throw new Error('User not authenticated');
+            }
+            
+            const response = await api.post('/notifications/read-all', {
+                user_id: userId,
+                user_type: userType
+            });
             return response.data;
         } catch (error) {
             throw error.response?.data || { success: false, message: 'Failed to mark all as read' };
