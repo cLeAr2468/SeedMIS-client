@@ -3,16 +3,26 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { X, Save, Loader2 } from 'lucide-react';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { X, Save, Loader2, Calendar as CalendarIcon } from 'lucide-react';
 import { toast } from 'sonner';
+import { format } from 'date-fns';
+import { cn } from '@/lib/utils';
 import requestService from '@/services/requestService';
 
 const EditRequestModal = ({ request, onClose, onSuccess }) => {
   const [loading, setLoading] = useState(false);
+  const [requestedDate, setRequestedDate] = useState(() => {
+    // Parse the existing date from the request
+    if (request.requested_date) {
+      return new Date(request.requested_date);
+    }
+    return new Date();
+  });
   const [formData, setFormData] = useState({
     seedling_type: request.seedling_type || '',
     quantity: request.quantity || 1,
-    requested_date: request.requested_date || new Date().toISOString().split('T')[0],
   });
 
   const handleChange = (e) => {
@@ -36,10 +46,19 @@ const EditRequestModal = ({ request, onClose, onSuccess }) => {
       return;
     }
 
+    if (!requestedDate) {
+      toast.error('Please select a requested date');
+      return;
+    }
+
     setLoading(true);
 
     try {
-      const response = await requestService.updateRequest(request.id, formData);
+      const updateData = {
+        ...formData,
+        requested_date: format(requestedDate, 'yyyy-MM-dd')
+      };
+      const response = await requestService.updateRequest(request.id, updateData);
       if (response.success) {
         toast.success('Request updated successfully');
         onSuccess();
@@ -53,7 +72,7 @@ const EditRequestModal = ({ request, onClose, onSuccess }) => {
 
   return (
     <div 
-      className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4"
+      className="fixed inset-0 isolate z-50 bg-black/20 duration-100 supports-backdrop-filter:backdrop-blur-sm flex items-center justify-center p-4"
       onClick={onClose}
     >
       <div
@@ -108,15 +127,37 @@ const EditRequestModal = ({ request, onClose, onSuccess }) => {
               {/* Requested Date */}
               <div className="space-y-2">
                 <Label htmlFor="requested_date">Requested Date</Label>
-                <Input
-                  id="requested_date"
-                  name="requested_date"
-                  type="date"
-                  value={formData.requested_date}
-                  onChange={handleChange}
-                  required
-                  className="h-11"
-                />
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      id="requested_date"
+                      type="button"
+                      variant="outline"
+                      className={cn(
+                        "w-full justify-between text-left font-normal h-11",
+                        !requestedDate && "text-muted-foreground"
+                      )}
+                    >
+                      {requestedDate ? format(requestedDate, "PPP") : "Pick a date"}
+                      <CalendarIcon className="ml-2 h-4 w-4" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={requestedDate}
+                      onSelect={setRequestedDate}
+                      disabled={(date) => {
+                        const today = new Date();
+                        today.setHours(0, 0, 0, 0);
+                        if (date < today) return true;
+                        const dayOfWeek = date.getDay();
+                        return dayOfWeek === 0 || dayOfWeek === 6;
+                      }}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
               </div>
 
               {/* Buttons */}

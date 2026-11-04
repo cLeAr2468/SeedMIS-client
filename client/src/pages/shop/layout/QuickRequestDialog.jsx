@@ -223,7 +223,13 @@ const QuickRequestDialog = ({ isOpen, onClose, seedling }) => {
                   mode="single"
                   selected={scheduleDate}
                   onSelect={setScheduleDate}
-                  disabled={(date) => date < new Date()}
+                  disabled={(date) => {
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+                    if (date < today) return true;
+                    const dayOfWeek = date.getDay();
+                    return dayOfWeek === 0 || dayOfWeek === 6;
+                  }}
                   initialFocus
                 />
               </PopoverContent>
@@ -261,7 +267,7 @@ const QuickRequestDialog = ({ isOpen, onClose, seedling }) => {
                   Submitting...
                 </>
               ) : (
-                'Submit Request'
+                'Checkout'
               )}
             </Button>
           </div>
