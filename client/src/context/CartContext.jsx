@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { toast } from 'sonner';
+import { useAuth } from './AuthContext';
 
 const CartContext = createContext();
 
@@ -12,27 +13,47 @@ export const useCart = () => {
 };
 
 export const CartProvider = ({ children }) => {
-  const [cart, setCart] = useState(() => {
-    // Load cart from localStorage on initial mount
+  const { user, loading: authLoading } = useAuth();
+  
+  // Get user-specific cart key based on current user
+  const getCartKey = (currentUser) => {
+    return currentUser?.id ? `seedmis_cart_user_${currentUser.id}` : 'seedmis_cart_guest';
+  };
+
+  // Load cart from localStorage for specific user
+  const loadCartFromStorage = (currentUser) => {
     try {
-      const savedCart = localStorage.getItem('seedmis_cart');
+      const cartKey = getCartKey(currentUser);
+      const savedCart = localStorage.getItem(cartKey);
       return savedCart ? JSON.parse(savedCart) : [];
     } catch (error) {
       console.error('Error loading cart from localStorage:', error);
       return [];
     }
-  });
+  };
 
+  const [cart, setCart] = useState([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
+
+  // Initialize cart only after auth is loaded
+  useEffect(() => {
+    if (!authLoading) {
+      const loadedCart = loadCartFromStorage(user);
+      setCart(loadedCart);
+    }
+  }, [authLoading, user?.id]);
 
   // Save cart to localStorage whenever it changes
   useEffect(() => {
-    try {
-      localStorage.setItem('seedmis_cart', JSON.stringify(cart));
-    } catch (error) {
-      console.error('Error saving cart to localStorage:', error);
+    if (!authLoading && user !== undefined) {
+      try {
+        const cartKey = getCartKey(user);
+        localStorage.setItem(cartKey, JSON.stringify(cart));
+      } catch (error) {
+        console.error('Error saving cart to localStorage:', error);
+      }
     }
-  }, [cart]);
+  }, [cart, user?.id, authLoading]);
 
   const addToCart = (seedling) => {
     const existing = cart.find((item) => item.id === seedling.id);

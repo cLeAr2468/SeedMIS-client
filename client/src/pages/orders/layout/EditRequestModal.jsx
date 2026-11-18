@@ -47,7 +47,7 @@ const EditRequestModal = ({ request, onClose, onSuccess }) => {
     }
 
     if (!requestedDate) {
-      toast.error('Please select a requested date');
+      toast.error('Please select a Pick-up Date');
       return;
     }
 
@@ -124,9 +124,9 @@ const EditRequestModal = ({ request, onClose, onSuccess }) => {
                 />
               </div>
 
-              {/* Requested Date */}
+              {/* Pick-up Date */}
               <div className="space-y-2">
-                <Label htmlFor="requested_date">Requested Date</Label>
+                <Label htmlFor="requested_date">Pick-up Date</Label>
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button

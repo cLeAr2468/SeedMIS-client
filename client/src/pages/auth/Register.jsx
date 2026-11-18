@@ -322,9 +322,9 @@ const Register = () => {
                     disabled={loading}
                     className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                   >
-                    <option value="">None</option>
-                    <option value="Jr.">Jr.</option>
-                    <option value="Sr.">Sr.</option>
+                    <option value="">Select Suffix</option>
+                    <option value="JR">Jr.</option>
+                    <option value="SR">Sr.</option>
                     <option value="II">II</option>
                     <option value="III">III</option>
                     <option value="IV">IV</option>

@@ -172,7 +172,7 @@ const RequestPage = () => {
     }
 
     if (!requestedDate) {
-      toast.error('Please select a requested date');
+      toast.error('Please select a Pick-up Date');
       return;
     }
 
@@ -675,10 +675,10 @@ const RequestPage = () => {
                     </CardContent>
                   </Card>
 
-                  {/* Requested Date Picker */}
+                  {/* Pick-up Date Picker */}
                   <div className="space-y-2 mt-4">
                     <Label htmlFor="requested_date" className="text-sm font-medium text-gray-700">
-                      Requested Date <span className="text-red-500">*</span>
+                      Pick-up Date <span className="text-red-500">*</span>
                     </Label>
                     <Popover>
                       <PopoverTrigger asChild>

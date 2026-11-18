@@ -39,7 +39,7 @@ const QuickRequestDialog = ({ isOpen, onClose, seedling }) => {
     }
 
     if (!scheduleDate) {
-      toast.error('Please select a schedule date');
+      toast.error('Please select a Pick-up Date');
       return;
     }
 
@@ -200,10 +200,10 @@ const QuickRequestDialog = ({ isOpen, onClose, seedling }) => {
             />
           </div>
 
-          {/* Schedule Date */}
+          {/* Pick-up Date */}
           <div className="space-y-2">
             <Label>
-              Schedule Date <span className="text-red-500">*</span>
+              Pick-up Date <span className="text-red-500">*</span>
             </Label>
             <Popover>
               <PopoverTrigger asChild>

@@ -216,7 +216,7 @@ const CartDrawer = ({
               {/* Date Picker */}
               <div className="space-y-2 mb-4">
                 <Label htmlFor="requested_date" className="text-sm font-medium text-gray-700">
-                  Requested Date <span className="text-red-500">*</span>
+                  Pick-up Date <span className="text-red-500">*</span>
                 </Label>
                 <Popover>
                   <PopoverTrigger asChild>

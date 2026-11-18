@@ -35,7 +35,7 @@ const GlobalCartDrawer = () => {
     }
 
     if (!requestedDate) {
-      toast.error('Please select a requested date');
+      toast.error('Please select a Pick-up Date');
       return;
     }
 
